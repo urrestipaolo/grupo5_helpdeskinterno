@@ -22,8 +22,8 @@ async function bootstrap() {
     }),
   );
   const config = new DocumentBuilder()
-    .setTitle('Api de usuarios y productos funvaleros :D')
-    .setDescription('api de los estudiantes de funval')
+    .setTitle('Api help desk Interno')
+    .setDescription('Reporte de incidencias tecnicas o requerimientos para gestionar')
     .setVersion('1.0.0')
     .addBearerAuth(
       {
