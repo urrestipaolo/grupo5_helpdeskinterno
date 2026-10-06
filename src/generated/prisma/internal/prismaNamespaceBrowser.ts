@@ -51,8 +51,10 @@ export const AnyNull = runtime.AnyNull
 
 
 export const ModelName = {
-  User: 'User',
-  Product: 'Product'
+  Usuario: 'Usuario',
+  Categoria: 'Categoria',
+  Ticket: 'Ticket',
+  Comentario: 'Comentario'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -71,28 +73,56 @@ export const TransactionIsolationLevel = runtime.makeStrictEnum({
 export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
 
 
-export const UserScalarFieldEnum = {
+export const UsuarioScalarFieldEnum = {
   id: 'id',
-  name: 'name',
+  nombre: 'nombre',
   email: 'email',
   password: 'password',
-  role: 'role',
+  rol: 'rol',
+  activo: 'activo',
   creadoEn: 'creadoEn'
 } as const
 
-export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+export type UsuarioScalarFieldEnum = (typeof UsuarioScalarFieldEnum)[keyof typeof UsuarioScalarFieldEnum]
 
 
-export const ProductScalarFieldEnum = {
+export const CategoriaScalarFieldEnum = {
   id: 'id',
-  name: 'name',
-  price: 'price',
-  description: 'description',
-  stock: 'stock',
+  nombre: 'nombre',
+  descripcion: 'descripcion',
+  activa: 'activa',
   creadoEn: 'creadoEn'
 } as const
 
-export type ProductScalarFieldEnum = (typeof ProductScalarFieldEnum)[keyof typeof ProductScalarFieldEnum]
+export type CategoriaScalarFieldEnum = (typeof CategoriaScalarFieldEnum)[keyof typeof CategoriaScalarFieldEnum]
+
+
+export const TicketScalarFieldEnum = {
+  id: 'id',
+  titulo: 'titulo',
+  descripcion: 'descripcion',
+  estado: 'estado',
+  prioridad: 'prioridad',
+  creadoEn: 'creadoEn',
+  actualizadoEn: 'actualizadoEn',
+  cerradoEn: 'cerradoEn',
+  creadorId: 'creadorId',
+  agenteId: 'agenteId',
+  categoriaId: 'categoriaId'
+} as const
+
+export type TicketScalarFieldEnum = (typeof TicketScalarFieldEnum)[keyof typeof TicketScalarFieldEnum]
+
+
+export const ComentarioScalarFieldEnum = {
+  id: 'id',
+  contenido: 'contenido',
+  creadoEn: 'creadoEn',
+  ticketId: 'ticketId',
+  autorId: 'autorId'
+} as const
+
+export type ComentarioScalarFieldEnum = (typeof ComentarioScalarFieldEnum)[keyof typeof ComentarioScalarFieldEnum]
 
 
 export const SortOrder = {

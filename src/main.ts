@@ -1,15 +1,17 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule, ObserveInstrument } from './app.module.js';
-import { ConfigService } from '@nestjs/config';
-import { ValidationPipe } from '@nestjs/common';
 import { PrismaExceptionFilter } from './common/filters/prisma-exception.filter.js';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { LoggingInterceptor } from './common/interceptors/logging.interceptor.js';
-import { TransformInterceptor } from './common/interceptors/transform.interceptor.js';
+import { ValidationPipe } from '@nestjs/common';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { LoggingInterceptor } from './common/interceptor/logging.interceptor.js';
+import { TransformInterceptor } from './common/interceptor/transform.interceptor.js';
+import { ConfigService } from '@nestjs/config';
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     instrument: ObserveInstrument,
   });
+
 
   app.useGlobalFilters(new PrismaExceptionFilter());
   app.useGlobalPipes(

@@ -13,25 +13,79 @@ datasource db {
   provider = "postgresql"
 }
 
-enum Role{
+// --- ENUM ---
+
+enum Rol {
   ADMIN
-  USER
+  AGENTE
+  EMPLEADO
 }
-model User{
-  id Int @id @default(autoincrement())
-  name String 
-  email String @unique
+
+enum EstadoTicket {
+  ABIERTO
+  EN_PROCESO
+  RESUELTO
+  CERRADO
+}
+
+enum Prioridad {
+  BAJA
+  MEDIA
+  ALTA
+}
+
+
+// --- MODULOS ---
+
+model Usuario {
+  id       Int      @id @default(autoincrement())
+  nombre   String
+  email    String   @unique
   password String
-  role Role @default(USER)
+  rol      Rol      @default(EMPLEADO)
+  activo   Boolean  @default(true)
   creadoEn DateTime @default(now())
-  @@map("usuarios")
+
+  ticketsCreados   Ticket[]     @relation("TicketCreador")
+  ticketsAsignados Ticket[]     @relation("TicketAgente")
+  comentarios      Comentario[]
 }
-model Product{
- id Int @id @default(autoincrement())
- name String 
- price Decimal @db.Decimal(10,2)
- description String?
- stock Int @default(0)
- creadoEn DateTime @default(now())
- @@map("productos")
+
+model Categoria {
+  id          Int      @id @default(autoincrement())
+  nombre      String   @unique
+  descripcion String?
+  activa      Boolean  @default(true)
+  creadoEn  DateTime @default(now())
+  tickets     Ticket[]
+}
+
+model Ticket {
+  id            Int          @id @default(autoincrement())
+  titulo        String
+  descripcion   String
+  estado        EstadoTicket @default(ABIERTO)
+  prioridad     Prioridad
+  creadoEn      DateTime     @default(now())
+  actualizadoEn DateTime     @updatedAt
+  cerradoEn     DateTime?
+
+  creadorId   Int
+  creador     Usuario   @relation("TicketCreador", fields: [creadorId], references: [id])
+  agenteId    Int?
+  agente      Usuario?  @relation("TicketAgente", fields: [agenteId], references: [id])
+  categoriaId Int
+  categoria   Categoria @relation(fields: [categoriaId], references: [id])
+
+  comentarios Comentario[]
+}
+
+model Comentario {
+  id        Int      @id @default(autoincrement())
+  contenido String
+  creadoEn  DateTime @default(now())
+  ticketId  Int
+  ticket    Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  autorId   Int
+  autor     Usuario  @relation(fields: [autorId], references: [id])
 }

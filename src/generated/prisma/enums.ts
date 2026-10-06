@@ -9,9 +9,29 @@
 * 🟢 You can import this file directly.
 */
 
-export const Role = {
+export const Rol = {
   ADMIN: 'ADMIN',
-  USER: 'USER'
+  AGENTE: 'AGENTE',
+  EMPLEADO: 'EMPLEADO'
 } as const
 
-export type Role = (typeof Role)[keyof typeof Role]
+export type Rol = (typeof Rol)[keyof typeof Rol]
+
+
+export const EstadoTicket = {
+  ABIERTO: 'ABIERTO',
+  EN_PROCESO: 'EN_PROCESO',
+  RESUELTO: 'RESUELTO',
+  CERRADO: 'CERRADO'
+} as const
+
+export type EstadoTicket = (typeof EstadoTicket)[keyof typeof EstadoTicket]
+
+
+export const Prioridad = {
+  BAJA: 'BAJA',
+  MEDIA: 'MEDIA',
+  ALTA: 'ALTA'
+} as const
+
+export type Prioridad = (typeof Prioridad)[keyof typeof Prioridad]
