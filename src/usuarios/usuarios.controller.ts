@@ -27,7 +27,11 @@ export class UsuariosController {
   constructor(private readonly usuariosService: UsuariosService) {}
 
   @Post()
-  @ApiOperation({ summary: 'Crear un usuario' })
+  @ApiOperation({
+    summary: 'Crear un usuario',
+    description:
+      'Endpoint administrativo. Solo un ADMIN puede crear usuarios con rol ADMIN, AGENTE o EMPLEADO. El registro público debe crear usuarios únicamente con rol EMPLEADO.',
+  })
   @ApiResponse({
     status: 201,
     description: 'Usuario creado correctamente',
