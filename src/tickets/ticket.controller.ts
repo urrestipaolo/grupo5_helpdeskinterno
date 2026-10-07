@@ -5,8 +5,10 @@ import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Req, U
 import { JwtAuthGuard, type UsuarioActualPayload } from "../auth/guards/jwt-auth.guard.js";
 import { UsuarioActual } from "../auth/decorators/usuario-actual.decorator.js";
 import { ApiOperation, ApiResponse } from "@nestjs/swagger";
+import { RolesGuard } from "../auth/guards/roles.guard.js";
+import { Roles } from "../auth/decorators/roles.decorator.js";
 
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 @ApiResponse({
     status: 401,
     description: 'No está autorizado, inicie sesión'
@@ -74,4 +76,10 @@ export class TicketController{
         return this.ticketService.remove(+id, usuario);
     }
 
+    //GET METRICAS
+    @Get('metricas')
+    @Roles('ADMIN', 'AGENTE')
+    metricas(){
+        return this.ticketService.metricas();
+    }
 }

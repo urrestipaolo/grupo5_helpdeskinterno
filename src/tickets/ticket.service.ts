@@ -119,5 +119,42 @@ export class TicketService {
     return await this.prisma.ticket.delete({
         where: { id },
     });
+    }
+
+    // --- METRICAS ---
+
+    async metricas(){
+        const estadox = Object.values(EstadoTicket).reduce(
+            (acc, estado) => ({ ...acc, [estado]: 0}),
+            {} as Record<EstadoTicket, number>,
+        );
+
+        const agrupados = await this.prisma.ticket.groupBy({
+            by:['estado'],
+            _count:{_all:true},
+        });
+        for (const grupo of agrupados){
+            estadox[grupo.estado] = grupo._count._all;
+        }
+
+        const categoriax = await this.prisma.categoria.findMany({
+            select: {
+                id: true,
+                nombre: true,
+                _count: { select: { tickets: true}},
+            },
+            orderBy: { id: 'asc'},
+        });
+
+        return{
+            total: Object.values(estadox).reduce((suma, n) => suma + n, 0),
+            estadox,
+            porCategorias: categoriax.map((c) => ({
+                id: c.id,
+                nombre: c.nombre,
+                total: c._count.tickets,
+            })),
+        };
+    }
 }
-}
+

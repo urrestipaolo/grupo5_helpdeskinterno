@@ -5,6 +5,34 @@
 [circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
 [circleci-url]: https://circleci.com/gh/nestjs/nest
 
+### METRICAS DE TICKETS
+
+```json
+{
+  "total": 7,
+  "porEstado": {
+    "ABIERTO": 4,
+    "EN_PROCESO": 3,
+    "RESUELTO": 0,
+    "CERRADO": 0
+  },
+  "porCategoria": [
+    { "id": 1, "nombre": "Hardware", "total": 5 },
+    { "id": 2, "nombre": "Software", "total": 2 },
+    { "id": 3, "nombre": "Redes", "total": 0 }
+  ]
+}
+```
+
+### DESCRIPCION DE LOS CAMPOS
+| `Total` - La cantidad total de los ticket que existen |
+| `porEstado` - Estado operativo de como se encuentra el ticket, si se encuentra ABIERTO, EN_PROCESO, RESULETO, CERRADO. |
+| `porCategoria` - Filtro para organizar la cantidad de ticket por sus categorias. Se encuentra la ID de la categoria, el nombre de la categoria, y el total de tickets que hay en la categoria |
+
+### Ejemplo de uso
+|`http://localhost:3000/tickets/metricas` autorización de token de un usuario ADMIN o AGENTE e ingresar por medio de metricas |
+
+
   <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
     <p align="center">
 <a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
