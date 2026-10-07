@@ -9,6 +9,7 @@ import { UpdateUsuarioDto } from './dto/update-usuario.dto.js';
 import * as bcrypt from 'bcryptjs';
 import { Prisma } from '../generated/prisma/client.js';
 import { Rol } from '../generated/prisma/enums.js';
+import { QueryUsuariosDto } from './dto/query-usuarios.dto.js';
 
 const usuarioPublicoSelect = {
   id: true,
@@ -47,14 +48,38 @@ export class UsuariosService {
     });
   }
 
-  async findAll(rol?: Rol) {
-    return this.prisma.usuario.findMany({
-      where: rol ? { rol, activo: true } : undefined,
-      select: usuarioPublicoSelect,
-      orderBy: {
-        id: 'asc',
+  async findAll(query: QueryUsuariosDto) {
+    const { rol, page, limit } = query;
+
+    const where = rol
+      ? {
+          rol,
+          activo: true,
+        }
+      : undefined;
+
+    const [usuarios, total] = await this.prisma.$transaction([
+      this.prisma.usuario.findMany({
+        where,
+        select: usuarioPublicoSelect,
+        orderBy: { id: 'asc' },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      this.prisma.usuario.count({
+        where,
+      }),
+    ]);
+
+    return {
+      data: usuarios,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
       },
-    });
+    };
   }
 
   async findOne(id: number) {

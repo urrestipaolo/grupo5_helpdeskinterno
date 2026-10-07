@@ -18,8 +18,14 @@ import {
   ApiResponse,
   ApiTags,
   ApiQuery,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { Rol } from '../generated/prisma/enums.js';
+import { UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
+import { RolesGuard } from '../auth/guards/roles.guard.js';
+import { Roles } from '../auth/decorators/roles.decorator.js';
+import { QueryUsuariosDto } from './dto/query-usuarios.dto.js';
 
 @ApiTags('Usuarios')
 @Controller('usuarios')
@@ -45,17 +51,20 @@ export class UsuariosController {
   }
 
   @Get()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Rol.ADMIN, Rol.AGENTE)
+  @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: 'Obtener todos los usuarios filtrados por rol (opcional)',
   })
-  @ApiQuery({
-    name: 'rol',
-    required: false,
-    enum: Rol,
-    description: 'Filtrar usuarios por rol',
-  })
-  findAll(@Query('rol') rol?: Rol) {
-    return this.usuariosService.findAll(rol);
+  // @ApiQuery({
+  //   name: 'rol',
+  //   required: false,
+  //   enum: Rol,
+  //   description: 'Filtrar usuarios por rol',
+  // })
+  findAll(@Query() query: QueryUsuariosDto) {
+    return this.usuariosService.findAll(query);
   }
 
   @Get(':id')
