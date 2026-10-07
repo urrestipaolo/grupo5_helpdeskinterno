@@ -7,11 +7,19 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import { UsuariosService } from './usuarios.service.js';
 import { CreateUsuarioDto } from './dto/create-usuario.dto.js';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto.js';
-import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+  ApiQuery,
+} from '@nestjs/swagger';
+import { Rol } from '../generated/prisma/enums.js';
 
 @ApiTags('Usuarios')
 @Controller('usuarios')
@@ -33,9 +41,17 @@ export class UsuariosController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Obtener todos los usuarios' })
-  findAll() {
-    return this.usuariosService.findAll();
+  @ApiOperation({
+    summary: 'Obtener todos los usuarios filtrados por rol (opcional)',
+  })
+  @ApiQuery({
+    name: 'rol',
+    required: false,
+    enum: Rol,
+    description: 'Filtrar usuarios por rol',
+  })
+  findAll(@Query('rol') rol?: Rol) {
+    return this.usuariosService.findAll(rol);
   }
 
   @Get(':id')

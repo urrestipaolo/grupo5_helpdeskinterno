@@ -7,6 +7,17 @@ import { PrismaService } from '../prisma/prisma.service.js';
 import { CreateUsuarioDto } from './dto/create-usuario.dto.js';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto.js';
 import * as bcrypt from 'bcryptjs';
+import { Prisma } from '../generated/prisma/client.js';
+import { Rol } from '../generated/prisma/enums.js';
+
+const usuarioPublicoSelect = {
+  id: true,
+  nombre: true,
+  email: true,
+  rol: true,
+  activo: true,
+  creadoEn: true,
+} satisfies Prisma.UsuarioSelect;
 
 @Injectable()
 export class UsuariosService {
@@ -32,27 +43,14 @@ export class UsuariosService {
         password: passwordHash,
         rol: createUsuarioDto.rol,
       },
-      select: {
-        id: true,
-        nombre: true,
-        email: true,
-        rol: true,
-        activo: true,
-        creadoEn: true,
-      },
+      select: usuarioPublicoSelect,
     });
   }
 
-  async findAll() {
+  async findAll(rol?: Rol) {
     return this.prisma.usuario.findMany({
-      select: {
-        id: true,
-        nombre: true,
-        email: true,
-        rol: true,
-        activo: true,
-        creadoEn: true,
-      },
+      where: rol ? { rol, activo: true } : undefined,
+      select: usuarioPublicoSelect,
       orderBy: {
         id: 'asc',
       },
@@ -64,14 +62,7 @@ export class UsuariosService {
       where: {
         id,
       },
-      select: {
-        id: true,
-        nombre: true,
-        email: true,
-        rol: true,
-        activo: true,
-        creadoEn: true,
-      },
+      select: usuarioPublicoSelect,
     });
 
     if (!usuario) {
@@ -96,7 +87,7 @@ export class UsuariosService {
       }
     }
 
-    const data: any = {
+    const data: Prisma.UsuarioUpdateInput = {
       ...updateUsuarioDto,
     };
 
@@ -109,19 +100,15 @@ export class UsuariosService {
         id,
       },
       data,
-      select: {
-        id: true,
-        nombre: true,
-        email: true,
-        rol: true,
-        activo: true,
-        creadoEn: true,
-      },
+      select: usuarioPublicoSelect,
     });
   }
 
   async remove(id: number) {
-    await this.findOne(id);
+    const usuario = await this.findOne(id);
+    if (!usuario.activo) {
+      throw new ConflictException('El usuario ya está inactivo');
+    }
 
     return this.prisma.usuario.update({
       where: {
@@ -130,13 +117,7 @@ export class UsuariosService {
       data: {
         activo: false,
       },
-      select: {
-        id: true,
-        nombre: true,
-        email: true,
-        rol: true,
-        activo: true,
-      },
+      select: usuarioPublicoSelect,
     });
   }
 
