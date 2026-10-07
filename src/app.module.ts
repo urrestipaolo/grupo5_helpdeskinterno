@@ -6,6 +6,8 @@ import { ConfigModule } from '@nestjs/config';
 import { envValidationSchema } from './config/env.validation.js';
 import { PrismaModule } from './prisma/prisma.module.js';
 import { TicketModule } from './tickets/ticket.module.js';
+import { ComentariosModule } from './comentarios/comentarios.module.js';
+import { UsuariosModule } from './usuarios/usuarios.module.js';
 
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
@@ -29,6 +31,8 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
     TicketModule,
     PrismaModule,
+    ComentariosModule,
+    UsuariosModule,
   ],
   controllers: [AppController],
   providers: [AppService],
