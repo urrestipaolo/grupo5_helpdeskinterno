@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import { envValidationSchema } from './config/env.validation.js';
 import { PrismaModule } from './prisma/prisma.module.js';
 import { UsuariosModule } from './usuarios/usuarios.module.js';
+import { ComentariosModule } from './comentarios/comentarios.module.js';
 
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
@@ -26,10 +27,11 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
       appSecret: 'YOUR_APP_SECRET',
       serviceId: 'first-app',
     }),
-    
+
     PrismaModule,
-    
+
     UsuariosModule,
+    ComentariosModule,
   ],
   controllers: [AppController],
   providers: [AppService],
