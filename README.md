@@ -21,54 +21,66 @@
   <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
   [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
-## Description
+# Help Desk Interno
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Backend para un sistema interno de gestión de incidencias y requerimientos técnicos.
 
-## Project setup
+El sistema permite registrar usuarios, administrar tickets, categorías y comentarios, asignar incidencias a agentes y controlar el acceso mediante roles.
 
-```bash
-$ npm install
-```
+## Tecnologías utilizadas
 
-## Compile and run the project
+- Node.js
+- NestJS
+- TypeScript
+- PostgreSQL
+- Prisma ORM
+- JWT
+- bcryptjs
+- Swagger
+- class-validator
+- Vitest
 
-```bash
-# development
-$ npm run start
+## Requisitos previos
 
-# watch mode
-$ npm run start:dev
+Antes de instalar el proyecto se debe contar con:
 
-# production mode
-$ npm run start:prod
-```
+- Node.js
+- npm
+- PostgreSQL
+- Git
 
-## Run tests
+## Instalación
 
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+Clonar el repositorio:
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
+git clone https://github.com/urrestipaolo/grupo5_helpdeskinterno.git
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+## Decisiones de negocio
+
+El equipo definió las siguientes reglas generales para el Help Desk:
+
+- Los usuarios tienen un único rol directo: `ADMIN`, `AGENTE` o `EMPLEADO`.
+- Los empleados pueden registrar incidencias y consultar los tickets que les corresponden.
+- Los agentes gestionan y atienden tickets.
+- Los administradores tienen acceso a funciones administrativas del sistema.
+- Los tickets utilizan los estados:
+  - `ABIERTO`
+  - `EN_PROCESO`
+  - `RESUELTO`
+  - `CERRADO`
+- Las prioridades disponibles son:
+  - `BAJA`
+  - `MEDIA`
+  - `ALTA`
+- La eliminación de usuarios se realiza mediante baja lógica, conservando el registro en la base de datos.
+- Los usuarios inactivos no deben ser considerados para nuevas asignaciones.
+- El registro público de usuarios debe crear cuentas con rol `EMPLEADO`.
+- Los roles internos `ADMIN` y `AGENTE` deben ser asignados únicamente mediante funciones administrativas.
+
+## Notificaciones
+
+El mecanismo de notificaciones será documentado en esta sección una vez que el equipo complete la historia US-18 y defina si se utilizarán WebSockets, correo electrónico u otra alternativa.
 
 ## Observability
 
@@ -112,3 +124,4 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+```
