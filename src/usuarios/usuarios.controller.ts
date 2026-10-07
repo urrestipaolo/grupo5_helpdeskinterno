@@ -28,11 +28,22 @@ import { Roles } from '../auth/decorators/roles.decorator.js';
 import { QueryUsuariosDto } from './dto/query-usuarios.dto.js';
 
 @ApiTags('Usuarios')
+@ApiBearerAuth('JWT-auth')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@ApiResponse({
+  status: 401,
+  description: 'Token no proporcionado o inválido',
+})
+@ApiResponse({
+  status: 403,
+  description: 'No tiene permisos para realizar esta acción',
+})
 @Controller('usuarios')
 export class UsuariosController {
   constructor(private readonly usuariosService: UsuariosService) {}
 
   @Post()
+  @Roles(Rol.ADMIN)
   @ApiOperation({
     summary: 'Crear un usuario',
     description:
@@ -51,9 +62,7 @@ export class UsuariosController {
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Rol.ADMIN, Rol.AGENTE)
-  @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: 'Obtener todos los usuarios filtrados por rol (opcional)',
   })
@@ -68,6 +77,7 @@ export class UsuariosController {
   }
 
   @Get(':id')
+  @Roles(Rol.ADMIN, Rol.AGENTE)
   @ApiOperation({ summary: 'Obtener un usuario por ID' })
   @ApiParam({
     name: 'id',
@@ -83,11 +93,16 @@ export class UsuariosController {
   }
 
   @Patch(':id')
+  @Roles(Rol.ADMIN)
   @ApiOperation({ summary: 'Actualizar un usuario' })
   @ApiParam({
     name: 'id',
     type: Number,
     example: 1,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Usuario no encontrado',
   })
   update(
     @Param('id', ParseIntPipe) id: number,
@@ -97,22 +112,40 @@ export class UsuariosController {
   }
 
   @Delete(':id')
+  @Roles(Rol.ADMIN)
   @ApiOperation({ summary: 'Desactivar un usuario' })
   @ApiParam({
     name: 'id',
     type: Number,
     example: 1,
   })
+  @ApiResponse({
+    status: 404,
+    description: 'Usuario no encontrado',
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'El usuario ya se encuentra inactivo',
+  })
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.usuariosService.remove(id);
   }
 
   @Patch(':id/reactivate')
+  @Roles(Rol.ADMIN)
   @ApiOperation({ summary: 'Reactivar un usuario' })
   @ApiParam({
     name: 'id',
     type: Number,
     example: 1,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Usuario no encontrado',
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'El usuario ya se encuentra activo',
   })
   reactivate(@Param('id', ParseIntPipe) id: number) {
     return this.usuariosService.reactivate(id);
