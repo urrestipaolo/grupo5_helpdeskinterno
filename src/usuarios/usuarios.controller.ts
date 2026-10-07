@@ -93,4 +93,15 @@ export class UsuariosController {
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.usuariosService.remove(id);
   }
+
+  @Patch(':id/reactivate')
+  @ApiOperation({ summary: 'Reactivar un usuario' })
+  @ApiParam({
+    name: 'id',
+    type: Number,
+    example: 1,
+  })
+  reactivate(@Param('id', ParseIntPipe) id: number) {
+    return this.usuariosService.reactivate(id);
+  }
 }

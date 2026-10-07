@@ -121,6 +121,23 @@ export class UsuariosService {
     });
   }
 
+  async reactivate(id: number) {
+    const usuario = await this.findOne(id);
+    if (usuario.activo) {
+      throw new ConflictException('El usuario ya está activo');
+    }
+
+    return this.prisma.usuario.update({
+      where: {
+        id,
+      },
+      data: {
+        activo: true,
+      },
+      select: usuarioPublicoSelect,
+    });
+  }
+
   async findByEmail(email: string) {
     return this.prisma.usuario.findUnique({
       where: {
