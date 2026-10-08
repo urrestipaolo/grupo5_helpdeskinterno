@@ -10,7 +10,7 @@ import {
   ParseIntPipe,
   Patch,
   Post,
-  Req,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -22,6 +22,7 @@ import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { RolesGuard } from '../auth/guards/roles.guard.js';
 import { Roles } from '../auth/decorators/roles.decorator.js';
 import { Rol } from '../generated/prisma/enums.js';
+import { QueryTicketsDto } from './dto/query-tickets.dto.js';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiResponse({
@@ -39,8 +40,11 @@ export class TicketController {
     status: 200,
     description: 'Lista desplegada con exito',
   })
-  findAll(@UsuarioActual() usuario: UsuarioActualPayload) {
-    return this.ticketService.findAll(usuario);
+  findAll(
+    @UsuarioActual() usuario: UsuarioActualPayload,
+    @Query() query: QueryTicketsDto,
+  ) {
+    return this.ticketService.findAll(usuario, query);
   }
 
   //GET METRICAS
