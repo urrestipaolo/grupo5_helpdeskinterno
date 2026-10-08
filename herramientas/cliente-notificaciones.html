@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Cliente de notificaciones - Help Desk</title>
+  <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+  <style>
+    body { font-family: sans-serif; max-width: 760px; margin: 24px auto; padding: 0 16px; }
+    input { width: 100%; padding: 8px; margin: 8px 0; }
+    button { padding: 8px 16px; }
+    #log { background: #111; color: #0f0; padding: 12px; min-height: 240px; white-space: pre-wrap; font-family: monospace; }
+  </style>
+</head>
+<body>
+  <h2>Cliente de notificaciones</h2>
+  <label>JWT (copiado de /auth/login):</label>
+  <input id="token" placeholder="eyJhbGciOi..." />
+  <button id="conectar">Conectar</button>
+  <h3>Eventos recibidos</h3>
+  <div id="log"></div>
+
+  <script>
+    const log = (texto) => {
+      document.getElementById('log').textContent += `[${new Date().toLocaleTimeString()}] ${texto}\n`;
+    };
+    let socket;
+    document.getElementById('conectar').onclick = () => {
+      if (socket) socket.disconnect();
+      socket = io('http://localhost:3000/notificaciones', {
+        auth: { token: document.getElementById('token').value.trim() },
+      });
+      socket.on('conectado', (d) => log('CONECTADO ' + JSON.stringify(d)));
+      socket.on('error', (d) => log('ERROR ' + JSON.stringify(d)));
+      socket.on('disconnect', () => log('Desconectado'));
+      socket.on('ticket.nuevo_comentario', (d) => log('NUEVO COMENTARIO ' + JSON.stringify(d, null, 2)));
+      socket.on('ticket.estado_cambiado', (d) => log('CAMBIO DE ESTADO ' + JSON.stringify(d, null, 2)));
+    };
+  </script>
+</body>
+</html>

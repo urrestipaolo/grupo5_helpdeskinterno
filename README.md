@@ -371,9 +371,20 @@ El equipo definió las siguientes reglas generales:
 
 ## Notificaciones
 
-Las historias US-18, US-19 y US-20 implementan el mecanismo de notificaciones del Help Desk.
+Opción elegida: **WebSockets con Socket.io** (Gateway de NestJS). Se eligió porque los avisos llegan en tiempo real, se pueden mostrar en vivo en la demo y no dependen de un servidor de correo externo.
 
-Esta sección debe actualizarse con la solución final elegida por el equipo una vez que dichas historias sean integradas en `master`.
+- Namespace: `ws://localhost:3000/notificaciones`
+- Autenticación: el cliente envía su JWT al conectarse (`auth: { token }`). Sin token válido, se desconecta.
+- Cada usuario entra a una sala privada (`usuario:<id>`), así cada aviso llega solo a quien corresponde.
+
+| Evento | Cuándo | Quién lo recibe |
+|---|---|---|
+| `ticket.nuevo_comentario` | Se agrega un comentario | Creador y agente asignado (menos el autor del comentario) |
+| `ticket.estado_cambiado` | Cambia el estado de un ticket | Creador y agente asignado (menos quien hizo el cambio) |
+
+Si una notificación falla (por ejemplo, el usuario no está conectado), se registra en el log y la operación principal se completa igual.
+
+Cliente de prueba: abrir `herramientas/cliente-notificaciones.html` en el navegador, pegar un JWT y conectar.
 
 ## Comandos útiles
 
