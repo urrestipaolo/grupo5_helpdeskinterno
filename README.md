@@ -82,46 +82,71 @@ El equipo definió las siguientes reglas generales para el Help Desk:
 
 El mecanismo de notificaciones será documentado en esta sección una vez que el equipo complete la historia US-18 y defina si se utilizarán WebSockets, correo electrónico u otra alternativa.
 
-## Observability
+```bash
+npm test -- usuarios.service.spec.ts
+```
 
-In production applications, observability is essential for understanding how your system behaves, detecting issues early, and maintaining reliable performance.
+## Roles
 
-[NestJS Observe](https://observe.nestjs.com) automatically instruments your NestJS application, giving you deep visibility into your system with minimal setup:
+El sistema utiliza tres roles:
 
-- **Distributed tracing:** Follow requests across services and understand how they flow through your system.
-- **Waterfall analysis:** Visualize request execution and identify slow operations, bottlenecks, and unexpected delays.
-- **Performance analysis:** Analyze application performance in real time and quickly pinpoint areas that need optimization.
-- **Metrics:** Track key application and infrastructure metrics to understand system health and performance trends.
-- **Logging:** Centralize and correlate logs with traces and other telemetry to make debugging easier.
-- **Error tracking:** Detect errors quickly and investigate their root causes with the surrounding context.
-- **SLA monitoring:** Track service-level objectives and identify when your application is approaching or exceeding defined thresholds.
-- **Alarms and alerts:** Set up alerts for critical errors, performance degradation, SLA violations, and other anomalies so your team can react quickly.
+- `ADMIN`: funciones administrativas.
+- `AGENTE`: gestión de incidencias asignadas.
+- `EMPLEADO`: creación y seguimiento de sus incidencias.
 
-## Resources
+El registro público crea usuarios con rol `EMPLEADO`.
 
-Check out a few resources that may come in handy when working with NestJS:
+Los roles `ADMIN` y `AGENTE` son roles internos y deben ser asignados mediante funciones administrativas.
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Auto-instrument your application with [NestJS Observer](https://observer.nestjs.com). Distributed tracing, metrics, and logging made easy. Error tracking and performance monitoring for your NestJS applications.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+## Estados de tickets
 
-## Support
+Los tickets utilizan los estados:
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+- `ABIERTO`
+- `EN_PROCESO`
+- `RESUELTO`
+- `CERRADO`
 
-## Stay in touch
+Prioridades disponibles:
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+- `BAJA`
+- `MEDIA`
+- `ALTA`
 
-## License
+## Usuarios
+
+El módulo de usuarios incluye:
+
+- creación de usuarios;
+- listado y consulta;
+- filtro por rol;
+- paginación;
+- actualización;
+- baja lógica;
+- reactivación;
+- protección mediante JWT y roles.
+
+La eliminación de usuarios se realiza mediante baja lógica para conservar el historial.
+
+## Notificaciones
+
+El mecanismo de notificaciones será documentado cuando se complete la implementación de las historias US-18, US-19 y US-20.
+
+## Flujo Git del equipo
+
+El equipo trabaja mediante ramas por funcionalidad.
+
+Flujo general:
+
+```text
+feature/*
+   ↓
+Pull Request
+   ↓
+Revisión
+   ↓
+master
+```
 
 Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
 ```
