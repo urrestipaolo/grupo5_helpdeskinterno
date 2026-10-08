@@ -49,94 +49,428 @@
   <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
   [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
-## Description
+# Help Desk Interno
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Backend para la gestión interna de incidencias y requerimientos técnicos.
 
-## Project setup
+El sistema permite registrar usuarios, autenticarse mediante JWT, gestionar tickets, categorías y comentarios, asignar incidencias a agentes, consultar métricas y restringir acciones según el rol del usuario.
 
-```bash
-$ npm install
-```
+## Tecnologías utilizadas
 
-## Compile and run the project
+- Node.js
+- NestJS
+- TypeScript
+- PostgreSQL
+- Prisma ORM
+- JWT
+- bcryptjs
+- Swagger
+- class-validator
+- Joi
+- Vitest
 
-```bash
-# development
-$ npm run start
+## Requisitos previos
 
-# watch mode
-$ npm run start:dev
+Antes de instalar el proyecto se debe contar con:
 
-# production mode
-$ npm run start:prod
-```
+- Node.js
+- npm
+- PostgreSQL
+- Git
 
-## Run tests
+## Instalación desde cero
 
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### 1. Clonar el repositorio
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+git clone https://github.com/urrestipaolo/grupo5_helpdeskinterno.git
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+Ingresar al proyecto:
 
-## Observability
+```bash
+cd grupo5_helpdeskinterno
+```
 
-In production applications, observability is essential for understanding how your system behaves, detecting issues early, and maintaining reliable performance.
+### 2. Instalar dependencias
 
-[NestJS Observe](https://observe.nestjs.com) automatically instruments your NestJS application, giving you deep visibility into your system with minimal setup:
+```bash
+npm install
+```
 
-- **Distributed tracing:** Follow requests across services and understand how they flow through your system.
-- **Waterfall analysis:** Visualize request execution and identify slow operations, bottlenecks, and unexpected delays.
-- **Performance analysis:** Analyze application performance in real time and quickly pinpoint areas that need optimization.
-- **Metrics:** Track key application and infrastructure metrics to understand system health and performance trends.
-- **Logging:** Centralize and correlate logs with traces and other telemetry to make debugging easier.
-- **Error tracking:** Detect errors quickly and investigate their root causes with the surrounding context.
-- **SLA monitoring:** Track service-level objectives and identify when your application is approaching or exceeding defined thresholds.
-- **Alarms and alerts:** Set up alerts for critical errors, performance degradation, SLA violations, and other anomalies so your team can react quickly.
+Las advertencias de paquetes obsoletos o vulnerabilidades de dependencias no necesariamente impiden ejecutar el proyecto. Si la instalación termina correctamente, se puede continuar.
 
-## Resources
+### 3. Configurar variables de entorno
 
-Check out a few resources that may come in handy when working with NestJS:
+El proyecto incluye un archivo `.env.example`.
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Auto-instrument your application with [NestJS Observer](https://observer.nestjs.com). Distributed tracing, metrics, and logging made easy. Error tracking and performance monitoring for your NestJS applications.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+Crear una copia llamada `.env`.
 
-## Support
+En Windows PowerShell:
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```powershell
+Copy-Item .env.example .env
+```
 
-## Stay in touch
+En Linux o macOS:
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+```bash
+cp .env.example .env
+```
 
-## License
+Luego editar `.env` con los datos locales.
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+Ejemplo:
+
+```env
+NODE_ENV="development"
+PORT=3000
+DATABASE_URL="postgresql://postgres:password@localhost:5432/helpdesk?schema=public"
+JWT_SECRET="cambia_esta_clave_por_una_de_al_menos_32_caracteres"
+JWT_EXPIRES_IN="8h"
+```
+
+> No se debe subir el archivo `.env` al repositorio.
+
+### 4. Configurar PostgreSQL
+
+Asegurarse de que PostgreSQL se encuentre iniciado y que las credenciales configuradas en `DATABASE_URL` sean válidas.
+
+Ejemplo:
+
+```env
+DATABASE_URL="postgresql://postgres:TU_PASSWORD@localhost:5432/helpdesk?schema=public"
+```
+
+El usuario configurado debe tener permisos para crear y modificar la base de datos utilizada por el proyecto.
+
+### 5. Generar Prisma Client
+
+```bash
+npx prisma generate
+```
+
+Salida esperada:
+
+```text
+Generated Prisma Client
+```
+
+### 6. Aplicar las migraciones
+
+```bash
+npx prisma migrate dev
+```
+
+Este comando crea o actualiza las tablas necesarias según el esquema Prisma.
+
+### 7. Cargar datos de prueba
+
+Ejecutar:
+
+```bash
+npx tsx prisma/seed.ts
+```
+
+El seed crea los siguientes usuarios:
+
+| Rol      | Email                  | Contraseña  |
+| -------- | ---------------------- | ----------- |
+| ADMIN    | admin@helpdesk.com     | Password123 |
+| AGENTE   | agente@helpdesk.com    | Password123 |
+| EMPLEADO | empleado@helpdesk.com  | Password123 |
+| EMPLEADO | empleado2@helpdesk.com | Password123 |
+
+## Verificación del proyecto
+
+### 8. Compilar
+
+```bash
+npm run build
+```
+
+El proyecto debe compilar sin errores.
+
+### 9. Ejecutar las pruebas
+
+```bash
+npm test
+```
+
+También se puede ejecutar una prueba específica:
+
+```bash
+npm test -- usuarios.service.spec.ts
+```
+
+### 10. Levantar el servidor
+
+```bash
+npm run start:dev
+```
+
+Por defecto la API se ejecuta en:
+
+```text
+http://localhost:3000
+```
+
+## Swagger
+
+La documentación interactiva está disponible en:
+
+```text
+http://localhost:3000/api
+```
+
+Desde Swagger se pueden consultar y probar los endpoints disponibles.
+
+Para probar endpoints protegidos:
+
+1. Ejecutar `POST /auth/login`.
+2. Copiar el token JWT recibido.
+3. Presionar `Authorize` en Swagger.
+4. Introducir el token.
+5. Ejecutar los endpoints protegidos.
+
+## Roles del sistema
+
+El sistema utiliza tres roles:
+
+- `ADMIN`: administración general del sistema.
+- `AGENTE`: gestión y atención de incidencias.
+- `EMPLEADO`: creación y seguimiento de sus propias incidencias.
+
+El registro público crea usuarios únicamente con rol:
+
+```text
+EMPLEADO
+```
+
+Los roles `ADMIN` y `AGENTE` deben ser asignados mediante funciones administrativas.
+
+## Usuarios
+
+El módulo de usuarios permite:
+
+- crear usuarios;
+- listar usuarios;
+- consultar un usuario;
+- filtrar por rol;
+- paginar resultados;
+- actualizar usuarios;
+- desactivar usuarios mediante baja lógica;
+- reactivar usuarios;
+- proteger acciones según JWT y rol.
+
+Ejemplo de paginación:
+
+```text
+GET /usuarios?page=1&limit=10
+```
+
+Ejemplo de filtro por rol:
+
+```text
+GET /usuarios?rol=AGENTE&page=1&limit=5
+```
+
+Solo `ADMIN` y `AGENTE` pueden consultar el listado de usuarios.
+
+Las operaciones administrativas de creación, modificación, baja y reactivación requieren rol `ADMIN`.
+
+Las contraseñas nunca se devuelven en las respuestas públicas de usuarios.
+
+## Tickets
+
+Los tickets utilizan los siguientes estados:
+
+- `ABIERTO`
+- `EN_PROCESO`
+- `RESUELTO`
+- `CERRADO`
+
+Prioridades disponibles:
+
+- `BAJA`
+- `MEDIA`
+- `ALTA`
+
+El flujo general de atención es:
+
+```text
+ABIERTO
+   ↓
+EN_PROCESO
+   ↓
+RESUELTO
+   ↓
+CERRADO
+```
+
+Los tickets pueden ser asignados a agentes para su atención.
+
+## Comentarios
+
+Los tickets permiten registrar comentarios asociados a:
+
+- un ticket;
+- un autor;
+- una fecha de creación.
+
+Los comentarios utilizan el usuario autenticado mediante JWT como autor.
+
+## Manejo global de errores
+
+La API utiliza un formato consistente para las respuestas de error.
+
+Ejemplo:
+
+```json
+{
+  "success": false,
+  "statusCode": 404,
+  "message": "Registro no encontrado",
+  "error": "Not Found",
+  "path": "/recurso",
+  "timestamp": "2026-10-08T00:00:00.000Z"
+}
+```
+
+Los errores no exponen:
+
+- stack traces;
+- consultas SQL;
+- detalles internos de Prisma;
+- contraseñas;
+- información sensible de la base de datos.
+
+Las respuestas exitosas también utilizan una estructura uniforme:
+
+```json
+{
+  "success": true,
+  "data": {},
+  "timestamp": "2026-10-08T00:00:00.000Z"
+}
+```
+
+## Decisiones de negocio
+
+El equipo definió las siguientes reglas generales:
+
+- cada usuario tiene un único rol directo;
+- el registro público siempre crea usuarios `EMPLEADO`;
+- solo funciones administrativas pueden asignar roles internos;
+- la eliminación de usuarios utiliza baja lógica;
+- los usuarios inactivos se conservan para mantener el historial;
+- los usuarios inactivos no deben utilizarse para nuevas asignaciones;
+- los empleados consultan únicamente los tickets que les corresponden;
+- los agentes gestionan incidencias;
+- los administradores tienen acceso a funciones administrativas.
+
+## Notificaciones
+
+Las historias US-18, US-19 y US-20 implementan el mecanismo de notificaciones del Help Desk.
+
+Esta sección debe actualizarse con la solución final elegida por el equipo una vez que dichas historias sean integradas en `master`.
+
+## Comandos útiles
+
+Compilar:
+
+```bash
+npm run build
+```
+
+Ejecutar en desarrollo:
+
+```bash
+npm run start:dev
+```
+
+Ejecutar todas las pruebas:
+
+```bash
+npm test
+```
+
+Ejecutar cobertura:
+
+```bash
+npm run test:cov
+```
+
+Ejecutar pruebas E2E:
+
+```bash
+npm run test:e2e
+```
+
+Generar Prisma Client:
+
+```bash
+npx prisma generate
+```
+
+Ejecutar migraciones:
+
+```bash
+npx prisma migrate dev
+```
+
+Cargar datos de prueba:
+
+```bash
+npx tsx prisma/seed.ts
+```
+
+## Flujo Git del equipo
+
+El equipo trabaja mediante ramas por funcionalidad.
+
+Flujo general:
+
+```text
+feature/*
+   ↓
+Pull Request
+   ↓
+Revisión del equipo
+   ↓
+Merge por Scrum Master
+   ↓
+master
+```
+
+Los integrantes desarrollan sus historias en ramas separadas y crean un Pull Request al terminar.
+
+Los merges a `master` son realizados por el Scrum Master después de la revisión correspondiente.
+
+## Prueba de instalación
+
+Para validar esta guía se recomienda probar el proyecto desde una carpeta o equipo nuevo siguiendo únicamente este README:
+
+```text
+Clonar
+  ↓
+npm install
+  ↓
+crear .env
+  ↓
+prisma generate
+  ↓
+prisma migrate dev
+  ↓
+seed
+  ↓
+build
+  ↓
+tests
+  ↓
+start:dev
+  ↓
+Swagger
+```
+
+Si el proyecto puede levantarse siguiendo únicamente estos pasos, la instalación puede considerarse reproducible.

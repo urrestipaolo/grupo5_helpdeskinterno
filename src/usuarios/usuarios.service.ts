@@ -7,6 +7,18 @@ import { PrismaService } from '../prisma/prisma.service.js';
 import { CreateUsuarioDto } from './dto/create-usuario.dto.js';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto.js';
 import * as bcrypt from 'bcryptjs';
+import { Prisma } from '../generated/prisma/client.js';
+import { Rol } from '../generated/prisma/enums.js';
+import { QueryUsuariosDto } from './dto/query-usuarios.dto.js';
+
+const usuarioPublicoSelect = {
+  id: true,
+  nombre: true,
+  email: true,
+  rol: true,
+  activo: true,
+  creadoEn: true,
+} satisfies Prisma.UsuarioSelect;
 
 @Injectable()
 export class UsuariosService {
@@ -32,31 +44,42 @@ export class UsuariosService {
         password: passwordHash,
         rol: createUsuarioDto.rol,
       },
-      select: {
-        id: true,
-        nombre: true,
-        email: true,
-        rol: true,
-        activo: true,
-        creadoEn: true,
-      },
+      select: usuarioPublicoSelect,
     });
   }
 
-  async findAll() {
-    return this.prisma.usuario.findMany({
-      select: {
-        id: true,
-        nombre: true,
-        email: true,
-        rol: true,
-        activo: true,
-        creadoEn: true,
+  async findAll(query: QueryUsuariosDto) {
+    const { rol, page, limit } = query;
+
+    const where = rol
+      ? {
+          rol,
+          activo: true,
+        }
+      : undefined;
+
+    const [usuarios, total] = await this.prisma.$transaction([
+      this.prisma.usuario.findMany({
+        where,
+        select: usuarioPublicoSelect,
+        orderBy: { id: 'asc' },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      this.prisma.usuario.count({
+        where,
+      }),
+    ]);
+
+    return {
+      data: usuarios,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
       },
-      orderBy: {
-        id: 'asc',
-      },
-    });
+    };
   }
 
   async findOne(id: number) {
@@ -64,14 +87,7 @@ export class UsuariosService {
       where: {
         id,
       },
-      select: {
-        id: true,
-        nombre: true,
-        email: true,
-        rol: true,
-        activo: true,
-        creadoEn: true,
-      },
+      select: usuarioPublicoSelect,
     });
 
     if (!usuario) {
@@ -96,7 +112,7 @@ export class UsuariosService {
       }
     }
 
-    const data: any = {
+    const data: Prisma.UsuarioUpdateInput = {
       ...updateUsuarioDto,
     };
 
@@ -109,19 +125,15 @@ export class UsuariosService {
         id,
       },
       data,
-      select: {
-        id: true,
-        nombre: true,
-        email: true,
-        rol: true,
-        activo: true,
-        creadoEn: true,
-      },
+      select: usuarioPublicoSelect,
     });
   }
 
   async remove(id: number) {
-    await this.findOne(id);
+    const usuario = await this.findOne(id);
+    if (!usuario.activo) {
+      throw new ConflictException('El usuario ya está inactivo');
+    }
 
     return this.prisma.usuario.update({
       where: {
@@ -130,13 +142,24 @@ export class UsuariosService {
       data: {
         activo: false,
       },
-      select: {
-        id: true,
-        nombre: true,
-        email: true,
-        rol: true,
+      select: usuarioPublicoSelect,
+    });
+  }
+
+  async reactivate(id: number) {
+    const usuario = await this.findOne(id);
+    if (usuario.activo) {
+      throw new ConflictException('El usuario ya está activo');
+    }
+
+    return this.prisma.usuario.update({
+      where: {
+        id,
+      },
+      data: {
         activo: true,
       },
+      select: usuarioPublicoSelect,
     });
   }
 
