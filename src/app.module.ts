@@ -9,6 +9,7 @@ import { TicketModule } from './tickets/ticket.module.js';
 import { ComentariosModule } from './comentarios/comentarios.module.js';
 import { AuthModule } from './auth/auth.module.js';
 import { UsuariosModule } from './usuarios/usuarios.module.js';
+import { NotificacionesModule } from './notificaciones/notificaciones.module.js';
 
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
@@ -35,6 +36,7 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
     ComentariosModule,
     AuthModule,
     UsuariosModule,
+    NotificacionesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

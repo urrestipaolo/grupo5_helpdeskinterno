@@ -11,10 +11,14 @@ import type { UsuarioActualPayload } from '../comentarios/comentarios.service.js
 import { EstadoTicket } from '../generated/prisma/client.js';
 import { Prisma } from '../generated/prisma/client.js';
 import { QueryTicketsDto } from './dto/query-tickets.dto.js';
+import { NotificacionesService } from '../notificaciones/notificaciones.service.js';
 
 @Injectable()
 export class TicketService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly notificaciones: NotificacionesService,
+  ) {}
 
   // Valida que el usuario exista, esté activo y tenga rol AGENTE
   private async validarAgente(agenteId: number) {
@@ -144,10 +148,26 @@ export class TicketService {
       }
     }
 
-    return await this.prisma.ticket.update({
+    const actualizado = await this.prisma.ticket.update({
       where: { id },
       data: updateTicketDto,
     });
+
+    // US-19: si cambió el estado, avisar al creador y al agente asignado.
+    // Se notifica DESPUÉS de guardar: si el aviso falla, el cambio ya quedó hecho.
+    if (
+      updateTicketDto.estado !== undefined &&
+      updateTicketDto.estado !== ticketx.estado
+    ) {
+      this.notificaciones.estadoCambiado(
+        actualizado,
+        ticketx.estado,
+        updateTicketDto.estado,
+        usuario.id,
+      );
+    }
+
+    return actualizado;
   }
 
   //ELIMINAR UN TICKET POR SU ID

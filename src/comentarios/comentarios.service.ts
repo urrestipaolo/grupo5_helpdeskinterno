@@ -3,6 +3,7 @@ import { PrismaService } from '../prisma/prisma.service.js';
 import { Prisma } from '../generated/prisma/client.js';
 import { Rol } from '../generated/prisma/enums.js';
 import { CreateComentarioDto } from './dto/create-comentario.dto.js';
+import { NotificacionesService } from '../notificaciones/notificaciones.service.js';
 
 export interface UsuarioActualPayload {
   id: number;
@@ -21,19 +22,23 @@ const selectComentario = {
 
 @Injectable()
 export class ComentariosService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly notificaciones: NotificacionesService,
+  ) {}
 
   async crear(ticketId: number, usuario: UsuarioActualPayload, dto: CreateComentarioDto) {
-    await this.verificarAcceso(ticketId, usuario);
+    const ticket = await this.verificarAcceso(ticketId, usuario);
 
-    return this.prisma.comentario.create({
-      data: {
-        contenido: dto.contenido,
-        ticketId,
-        autorId: usuario.id, // el autor SIEMPRE sale del token
-      },
+    const comentario = await this.prisma.comentario.create({
+      data: { contenido: dto.contenido, ticketId, autorId: usuario.id },
       select: selectComentario,
     });
+
+    // Se notifica DESPUÉS de guardar: si el aviso falla, el comentario ya existe
+    this.notificaciones.nuevoComentario(ticket, comentario);
+
+    return comentario;
   }
 
   async listar(ticketId: number, usuario: UsuarioActualPayload) {
@@ -51,7 +56,8 @@ export class ComentariosService {
   private async verificarAcceso(ticketId: number, usuario: UsuarioActualPayload) {
     const ticket = await this.prisma.ticket.findUnique({
       where: { id: ticketId },
-      select: { id: true, creadorId: true },
+      // titulo y agenteId los necesita la notificación de comentario nuevo
+      select: { id: true, titulo: true, creadorId: true, agenteId: true },
     });
 
     const esAjeno = usuario.rol === Rol.EMPLEADO && ticket?.creadorId !== usuario.id;
