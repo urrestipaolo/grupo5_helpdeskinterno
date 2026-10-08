@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule, ObserveInstrument } from './app.module.js';
-import { PrismaExceptionFilter } from './common/filters/prisma-exception.filter.js';
+import { AllExceptionsFilter } from './common/filters/all-exceptions.filter.js';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { LoggingInterceptor } from './common/interceptor/logging.interceptor.js';
@@ -12,8 +12,7 @@ async function bootstrap() {
     instrument: ObserveInstrument,
   });
 
-
-  app.useGlobalFilters(new PrismaExceptionFilter());
+  app.useGlobalFilters(new AllExceptionsFilter());
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -23,7 +22,9 @@ async function bootstrap() {
   );
   const config = new DocumentBuilder()
     .setTitle('Api help desk Interno')
-    .setDescription('Reporte de incidencias tecnicas o requerimientos para gestionar')
+    .setDescription(
+      'Reporte de incidencias tecnicas o requerimientos para gestionar',
+    )
     .setVersion('1.0.0')
     .addBearerAuth(
       {
