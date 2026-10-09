@@ -11,9 +11,11 @@ describe('UsuariosService', () => {
     usuario: {
       findUnique: vi.fn(),
       findMany: vi.fn(),
+      count: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
     },
+    $transaction: vi.fn(),
   };
 
   beforeEach(() => {
@@ -27,7 +29,7 @@ describe('UsuariosService', () => {
   });
 
   it('debería listar usuarios', async () => {
-    prismaMock.usuario.findMany.mockResolvedValue([
+    const usuarios = [
       {
         id: 1,
         nombre: 'Usuario Prueba',
@@ -36,12 +38,26 @@ describe('UsuariosService', () => {
         activo: true,
         creadoEn: new Date(),
       },
-    ]);
+    ];
+    prismaMock.usuario.findMany.mockResolvedValue(usuarios);
+    prismaMock.usuario.count.mockResolvedValue(1);
 
-    const resultado = await service.findAll();
+    prismaMock.$transaction.mockResolvedValue([usuarios, 1]);
 
-    expect(resultado).toHaveLength(1);
+    const resultado = await service.findAll({
+      page: 1,
+      limit: 10,
+    });
+
+    expect(resultado.data).toHaveLength(1);
+    expect(resultado.meta).toEqual({
+      total: 1,
+      page: 1,
+      limit: 10,
+      totalPages: 1,
+    });
     expect(prismaMock.usuario.findMany).toHaveBeenCalled();
+    expect(prismaMock.usuario.count).toHaveBeenCalled();
   });
 
   it('debería encontrar un usuario por id', async () => {
