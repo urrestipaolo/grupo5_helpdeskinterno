@@ -25,13 +25,14 @@
 ```
 
 ### DESCRIPCION DE LOS CAMPOS
+
 | `Total` - La cantidad total de los ticket que existen |
 | `porEstado` - Estado operativo de como se encuentra el ticket, si se encuentra ABIERTO, EN_PROCESO, RESULETO, CERRADO. |
 | `porCategoria` - Filtro para organizar la cantidad de ticket por sus categorias. Se encuentra la ID de la categoria, el nombre de la categoria, y el total de tickets que hay en la categoria |
 
 ### Ejemplo de uso
-|`http://localhost:3000/tickets/metricas` autorización de token de un usuario ADMIN o AGENTE e ingresar por medio de metricas |
 
+|`http://localhost:3000/tickets/metricas` autorización de token de un usuario ADMIN o AGENTE e ingresar por medio de metricas |
 
   <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
     <p align="center">
@@ -377,10 +378,10 @@ Opción elegida: **WebSockets con Socket.io** (Gateway de NestJS). Se eligió po
 - Autenticación: el cliente envía su JWT al conectarse (`auth: { token }`). Sin token válido, se desconecta.
 - Cada usuario entra a una sala privada (`usuario:<id>`), así cada aviso llega solo a quien corresponde.
 
-| Evento | Cuándo | Quién lo recibe |
-|---|---|---|
-| `ticket.nuevo_comentario` | Se agrega un comentario | Creador y agente asignado (menos el autor del comentario) |
-| `ticket.estado_cambiado` | Cambia el estado de un ticket | Creador y agente asignado (menos quien hizo el cambio) |
+| Evento                    | Cuándo                        | Quién lo recibe                                           |
+| ------------------------- | ----------------------------- | --------------------------------------------------------- |
+| `ticket.nuevo_comentario` | Se agrega un comentario       | Creador y agente asignado (menos el autor del comentario) |
+| `ticket.estado_cambiado`  | Cambia el estado de un ticket | Creador y agente asignado (menos quien hizo el cambio)    |
 
 Si una notificación falla (por ejemplo, el usuario no está conectado), se registra en el log y la operación principal se completa igual.
 
@@ -485,3 +486,26 @@ Swagger
 ```
 
 Si el proyecto puede levantarse siguiendo únicamente estos pasos, la instalación puede considerarse reproducible.
+
+Notificaciones en tiempo real
+Para las notificaciones elegimos WebSockets con NestJS y Socket.IO, porque permiten avisar a los usuarios cuando ocurre algo importante sin necesidad de actualizar la página.
+
+Conexión
+Namespace: http://localhost:3000/notificaciones
+Autenticación: el cliente debe enviar su JWT al conectarse. Si el token no es válido o no se proporciona, se cierra la conexión.
+Salas privadas: cada usuario se une a una sala identificada por su ID (usuario:<id>). De esta manera, los avisos se envían únicamente a los usuarios que corresponden.
+Eventos disponibles
+Evento Cuándo se envía Destinatarios
+ticket.nuevo_comentario Cuando se agrega un comentario a un ticket. El creador y el agente asignado, excepto quien escribió el comentario.
+ticket.estado_cambiado Cuando se modifica el estado de un ticket. El creador y el agente asignado, excepto quien realizó el cambio.
+Si el usuario que debe recibir la notificación no está conectado, no recibirá el evento en tiempo real. Esto no impide que se complete la operación principal, como guardar un comentario o actualizar el estado del ticket.
+
+Cómo probar las notificaciones
+Se pueden probar desde Postman siguiendo estos pasos:
+
+Iniciar sesión y obtener un JWT válido.
+Crear una conexión Socket.IO al namespace /notificaciones y enviar el token al conectarse.
+Escuchar los eventos ticket.estado_cambiado y ticket.nuevo_comentario.
+Desde otra petición, cambiar el estado de un ticket o agregar un comentario.
+Comprobar que el cliente conectado recibe el evento correspondiente.
+También se puede utilizar el cliente de prueba ubicado en herramientas/cliente-notificaciones.html, pegando un JWT válido y conectándose al servidor.

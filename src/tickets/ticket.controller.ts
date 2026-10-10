@@ -18,12 +18,13 @@ import {
   type UsuarioActualPayload,
 } from '../auth/guards/jwt-auth.guard.js';
 import { UsuarioActual } from '../auth/decorators/usuario-actual.decorator.js';
-import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { RolesGuard } from '../auth/guards/roles.guard.js';
 import { Roles } from '../auth/decorators/roles.decorator.js';
 import { Rol } from '../generated/prisma/enums.js';
 import { QueryTicketsDto } from './dto/query-tickets.dto.js';
 
+@ApiBearerAuth('JWT-auth')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiResponse({
   status: 401,
@@ -49,7 +50,8 @@ export class TicketController {
 
   //GET METRICAS
   @Get('metricas')
-  @Roles('ADMIN', 'AGENTE')
+  @Roles(Rol.ADMIN, Rol.AGENTE)
+  @ApiOperation({ summary: 'Consultar métricas de tickets' })
   metricas() {
     return this.ticketService.metricas();
   }

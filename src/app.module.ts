@@ -10,6 +10,7 @@ import { ComentariosModule } from './comentarios/comentarios.module.js';
 import { AuthModule } from './auth/auth.module.js';
 import { UsuariosModule } from './usuarios/usuarios.module.js';
 import { NotificacionesModule } from './notificaciones/notificaciones.module.js';
+import { CategoriasModule } from './categorias/categorias.module.js';
 
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
@@ -26,17 +27,17 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
       },
     }),
     ObserveModule.forRoot({
-      appKey: 'YOUR_APP_KEY',
-      appSecret: 'YOUR_APP_SECRET',
+      appKey: process.env.OBSERVE_APP_KEY!,
+      appSecret: process.env.OBSERVE_APP_SECRET!,
       serviceId: 'first-app',
     }),
-
     TicketModule,
     PrismaModule,
     ComentariosModule,
     AuthModule,
     UsuariosModule,
     NotificacionesModule,
+    CategoriasModule,
   ],
   controllers: [AppController],
   providers: [AppService],

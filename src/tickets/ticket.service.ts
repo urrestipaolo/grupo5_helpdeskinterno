@@ -159,12 +159,19 @@ export class TicketService {
       updateTicketDto.estado !== undefined &&
       updateTicketDto.estado !== ticketx.estado
     ) {
-      this.notificaciones.estadoCambiado(
-        actualizado,
-        ticketx.estado,
-        updateTicketDto.estado,
-        usuario.id,
-      );
+      try {
+        this.notificaciones.estadoCambiado(
+          actualizado,
+          ticketx.estado,
+          updateTicketDto.estado,
+          usuario.id,
+        );
+      } catch (error) {
+        console.error(
+          'El ticket se actualizó, pero falló la notificación:',
+          error,
+        );
+      }
     }
 
     return actualizado;

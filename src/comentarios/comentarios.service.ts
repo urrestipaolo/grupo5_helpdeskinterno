@@ -27,7 +27,11 @@ export class ComentariosService {
     private readonly notificaciones: NotificacionesService,
   ) {}
 
-  async crear(ticketId: number, usuario: UsuarioActualPayload, dto: CreateComentarioDto) {
+  async crear(
+    ticketId: number,
+    usuario: UsuarioActualPayload,
+    dto: CreateComentarioDto,
+  ) {
     const ticket = await this.verificarAcceso(ticketId, usuario);
 
     const comentario = await this.prisma.comentario.create({
@@ -35,8 +39,16 @@ export class ComentariosService {
       select: selectComentario,
     });
 
-    // Se notifica DESPUÉS de guardar: si el aviso falla, el comentario ya existe
-    this.notificaciones.nuevoComentario(ticket, comentario);
+    // Se notifica DESPUÉS de guardar el comentario.
+    // Si falla el aviso, no debe afectar la creación del comentario.
+    try {
+      this.notificaciones.nuevoComentario(ticket, comentario);
+    } catch (error) {
+      console.error(
+        'El comentario se guardó, pero falló la notificación:',
+        error,
+      );
+    }
 
     return comentario;
   }
@@ -53,14 +65,18 @@ export class ComentariosService {
 
   // Misma regla de visibilidad que los tickets:
   // ADMIN y AGENTE ven todos; un EMPLEADO solo los que creó.
-  private async verificarAcceso(ticketId: number, usuario: UsuarioActualPayload) {
+  private async verificarAcceso(
+    ticketId: number,
+    usuario: UsuarioActualPayload,
+  ) {
     const ticket = await this.prisma.ticket.findUnique({
       where: { id: ticketId },
       // titulo y agenteId los necesita la notificación de comentario nuevo
       select: { id: true, titulo: true, creadorId: true, agenteId: true },
     });
 
-    const esAjeno = usuario.rol === Rol.EMPLEADO && ticket?.creadorId !== usuario.id;
+    const esAjeno =
+      usuario.rol === Rol.EMPLEADO && ticket?.creadorId !== usuario.id;
     if (!ticket || esAjeno) {
       throw new NotFoundException(`Ticket con ID ${ticketId} no encontrado`);
     }
