@@ -13,6 +13,7 @@ async function bootstrap() {
   });
 
   app.useGlobalFilters(new AllExceptionsFilter());
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -20,10 +21,11 @@ async function bootstrap() {
       transform: true,
     }),
   );
+
   const config = new DocumentBuilder()
     .setTitle('Api help desk Interno')
     .setDescription(
-      'Reporte de incidencias tecnicas o requerimientos para gestionar',
+      'Reporte de incidencias técnicas o requerimientos para gestionar',
     )
     .setVersion('1.0.0')
     .addBearerAuth(
@@ -31,22 +33,22 @@ async function bootstrap() {
         type: 'http',
         scheme: 'bearer',
         bearerFormat: 'JWT',
-        name: 'JWT',
-        description: 'ingresa tu JWT token aqui',
-        in: 'header',
       },
       'JWT-auth',
     )
     .build();
+
   const documentFactory = () => SwaggerModule.createDocument(app, config);
+
   SwaggerModule.setup('api', app, documentFactory);
 
   app.useGlobalInterceptors(
     new LoggingInterceptor(),
     new TransformInterceptor(),
   );
-  // await app.listen(process.env.PORT ?? 3000)
+
   const configService = app.get(ConfigService);
   await app.listen(configService.getOrThrow<number>('PORT'));
 }
+
 await bootstrap();
