@@ -11,9 +11,11 @@ describe('UsuariosService', () => {
     usuario: {
       findUnique: vi.fn(),
       findMany: vi.fn(),
+      count: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
     },
+    $transaction: vi.fn(),
   };
 
   beforeEach(() => {
@@ -37,11 +39,21 @@ describe('UsuariosService', () => {
         creadoEn: new Date(),
       },
     ]);
+    prismaMock.usuario.count.mockResolvedValue(1);
 
-    const resultado = await service.findAll();
+    prismaMock.$transaction.mockImplementation(
+      (consultas: Promise<unknown>[]) => Promise.all(consultas),
+    );
 
-    expect(resultado).toHaveLength(1);
+    const resultado = await service.findAll({
+      page: 1,
+      limit: 10,
+    });
+
+    expect(resultado.data).toHaveLength(1);
+    expect(resultado.meta.total).toBe(1);
     expect(prismaMock.usuario.findMany).toHaveBeenCalled();
+    expect(prismaMock.$transaction).toHaveBeenCalled();
   });
 
   it('debería encontrar un usuario por id', async () => {

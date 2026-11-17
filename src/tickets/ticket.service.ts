@@ -150,7 +150,12 @@ export class TicketService {
 
     const actualizado = await this.prisma.ticket.update({
       where: { id },
-      data: updateTicketDto,
+      data: {
+        ...updateTicketDto,
+        ...(updateTicketDto.estado === EstadoTicket.CERRADO && {
+          cerradoEn: new Date(),
+        }),
+      },
     });
 
     // US-19: si cambió el estado, avisar al creador y al agente asignado.
