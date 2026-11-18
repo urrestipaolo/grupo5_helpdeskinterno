@@ -30,9 +30,11 @@ export class CreateTicketDto {
   })
   estado?: EstadoTicket;
 
-  @IsString({ message: 'El estado debe ser un texto' })
-  @IsNotEmpty({ message: 'El estado es obligatorio' })
-  @IsEnum(Prioridad, { message: 'La prioridad debe ser BAJA, MEDIA, ALTA' })
+  @IsString({ message: 'La prioridad debe ser un texto' })
+  @IsNotEmpty({ message: 'La prioridad es obligatoria' })
+  @IsEnum(Prioridad, {
+    message: 'La prioridad debe ser BAJA, MEDIA o ALTA',
+  })
   prioridad: Prioridad;
 
   @IsOptional()

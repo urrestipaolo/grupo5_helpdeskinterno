@@ -222,8 +222,8 @@ export class TicketService {
 
     return {
       total: Object.values(estadox).reduce((suma, n) => suma + n, 0),
-      estadox,
-      porCategorias: categoriax.map((c) => ({
+      porEstado: estadox,
+      porCategoria: categoriax.map((c) => ({
         id: c.id,
         nombre: c.nombre,
         total: c._count.tickets,
