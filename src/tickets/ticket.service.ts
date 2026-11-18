@@ -13,6 +13,13 @@ import { Prisma } from '../generated/prisma/client.js';
 import { QueryTicketsDto } from './dto/query-tickets.dto.js';
 import { NotificacionesService } from '../notificaciones/notificaciones.service.js';
 
+// Relaciones que se devuelven junto con cada ticket (sin datos sensibles como el password)
+const incluirRelaciones = {
+  creador: { select: { id: true, nombre: true, email: true } },
+  agente: { select: { id: true, nombre: true, email: true } },
+  categoria: { select: { id: true, nombre: true } },
+} satisfies Prisma.TicketInclude;
+
 @Injectable()
 export class TicketService {
   constructor(
@@ -95,6 +102,7 @@ export class TicketService {
       this.prisma.ticket.findMany({
         where,
         orderBy: { id: 'asc' },
+        include: incluirRelaciones,
         skip: (page - 1) * limit,
         take: limit,
       }),
@@ -116,6 +124,7 @@ export class TicketService {
   async findOne(id: number, usuario: UsuarioActualPayload) {
     const ticketx = await this.prisma.ticket.findFirst({
       where: { id, ...this.filtroAcceso(usuario) },
+      include: incluirRelaciones,
     });
     if (!ticketx) {
       throw new NotFoundException('No se ha encontrado el ID del ticket');
