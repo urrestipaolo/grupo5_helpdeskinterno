@@ -100,20 +100,20 @@ export class TicketController {
     description: 'Ticket actualizado con exito',
   })
   update(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body() updateTicketDto: UpdateTicketDto,
     @UsuarioActual() usuario: UsuarioActualPayload,
   ) {
-    return this.ticketService.update(+id, updateTicketDto, usuario);
+    return this.ticketService.update(id, updateTicketDto, usuario);
   }
 
   //DELETE ELIMINAR UN TICKET POR SU ID
   @Delete(':id')
   @ApiOperation({ summary: 'Eliminar un ticket por su ID' })
   remove(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
     @UsuarioActual() usuario: UsuarioActualPayload,
   ) {
-    return this.ticketService.remove(+id, usuario);
+    return this.ticketService.remove(id, usuario);
   }
 }
