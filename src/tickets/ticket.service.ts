@@ -169,9 +169,10 @@ export class TicketService {
       where: { id },
       data: {
         ...updateTicketDto,
-        ...(updateTicketDto.estado === EstadoTicket.CERRADO && {
-          cerradoEn: new Date(),
-        }),
+        ...(updateTicketDto.estado === EstadoTicket.CERRADO &&
+          ticketx.estado !== EstadoTicket.CERRADO && {
+            cerradoEn: new Date(),
+          }),
       },
     });
 
