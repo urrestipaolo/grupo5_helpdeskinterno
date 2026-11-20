@@ -60,6 +60,27 @@ export class TicketService {
   }
 
   // Qué tickets puede ver cada rol
+  // Traduce los filtros del listado (?estado=&prioridad=&categoriaId=&agenteId=&desde=&hasta=) a Prisma
+  private filtrosListado(query: QueryTicketsDto): Prisma.TicketWhereInput {
+    const { estado, prioridad, categoriaId, agenteId, desde, hasta } = query;
+    const where: Prisma.TicketWhereInput = {};
+
+    if (estado) where.estado = estado;
+    if (prioridad) where.prioridad = prioridad;
+    if (categoriaId) where.categoriaId = categoriaId;
+    // agenteId = 0 significa "sin asignar"
+    if (agenteId !== undefined) where.agenteId = agenteId === 0 ? null : agenteId;
+
+    // Las fechas se interpretan en horario de Argentina (UTC-3) y "hasta" incluye todo ese día
+    if (desde || hasta) {
+      where.creadoEn = {};
+      if (desde) where.creadoEn.gte = new Date(`${desde.slice(0, 10)}T00:00:00-03:00`);
+      if (hasta) where.creadoEn.lte = new Date(`${hasta.slice(0, 10)}T23:59:59.999-03:00`);
+    }
+
+    return where;
+  }
+
   private filtroAcceso(usuario: UsuarioActualPayload): Prisma.TicketWhereInput {
     // ADMIN y AGENTE ven todos los tickets
     if (usuario.rol === 'ADMIN' || usuario.rol === 'AGENTE') {
@@ -96,7 +117,11 @@ export class TicketService {
   //BUSCAR TODOS
   async findAll(usuario: UsuarioActualPayload, query: QueryTicketsDto) {
     const { page, limit } = query;
-    const where = this.filtroAcceso(usuario);
+    // Primero el filtro por rol (el EMPLEADO solo ve los suyos) y después los filtros opcionales
+    const where: Prisma.TicketWhereInput = {
+      ...this.filtroAcceso(usuario),
+      ...this.filtrosListado(query),
+    };
 
     const [tickets, total] = await this.prisma.$transaction([
       this.prisma.ticket.findMany({
