@@ -139,6 +139,14 @@ export class TicketService {
     usuario: UsuarioActualPayload,
   ) {
     const ticketx = await this.findOne(id, usuario);
+
+    // US-17: el estado solo lo cambian ADMIN y AGENTE (el EMPLEADO solo reporta)
+    if (updateTicketDto.estado !== undefined && usuario.rol === 'EMPLEADO') {
+      throw new ForbiddenException(
+        'Solo un ADMIN o un AGENTE puede cambiar el estado de un ticket',
+      );
+    }
+
     await this.validarAsignacion(updateTicketDto.agenteId, usuario);
 
     if (updateTicketDto.categoriaId !== undefined) {
